@@ -1,4 +1,4 @@
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed } from 'vue'; // Đã xóa onMounted vì không còn cần thiết
 import { useFinanceStore } from '../stores/financeStore';
 import type { TransactionType } from '../types/finance';
 
@@ -14,13 +14,12 @@ export function useFinance() {
   const formDescription = ref<string>('');
   const errorMessage = ref<string>('');
 
-  onMounted(() => {
-    store.loadFromLocalStorage();
-  });
+  // ❌ Đã xóa onMounted(() => { store.loadFromLocalStorage(); })
+  // Vì pinia-plugin-persistedstate đã tự động làm việc này ngay khi store được khởi tạo!
 
   const submitForm = () => {
     errorMessage.value = '';
-    
+
     if (!formDescription.value.trim()) {
       errorMessage.value = 'Vui lòng nhập mô tả.';
       return;
@@ -30,6 +29,7 @@ export function useFinance() {
       return;
     }
 
+    // Cú pháp gọi action vẫn giữ nguyên, rất tiện lợi!
     store.addTransaction({
       type: formType.value,
       amount: formAmount.value,
@@ -47,6 +47,7 @@ export function useFinance() {
   };
 
   const sortedTransactions = computed(() => {
+    // Truy cập mảng giao dịch trực tiếp từ store
     return [...store.transactions].sort((a, b) => {
       return new Date(b.date).getTime() - new Date(a.date).getTime();
     });
@@ -66,7 +67,7 @@ export function useFinance() {
 
   const filteredStats = computed(() => {
     const now = new Date();
-    
+
     const filtered = store.transactions.filter(t => {
       const tDate = new Date(t.date);
       if (reportFilter.value === 'year') {
@@ -85,7 +86,7 @@ export function useFinance() {
 
     const income = filtered.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
     const expense = filtered.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
-    
+
     let ratio = 0;
     if (income === 0) {
       ratio = expense > 0 ? 100 : 0;
@@ -117,7 +118,7 @@ export function useFinance() {
   };
 
   return {
-    store,
+    store, // Trả về store để template có thể gọi store.totalIncome, store.balance...
     formType,
     formDate,
     formAmount,
@@ -128,7 +129,7 @@ export function useFinance() {
     sortedTransactions,
     formatCurrency,
     formatDate,
-    
+
     activeTab,
     reportFilter,
     filterLabel,
