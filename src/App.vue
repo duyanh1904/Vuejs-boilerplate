@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import FinanceManager from './components/FinanceManager.vue'
+import WeatherWidget from './components/WeatherWidget.vue';
 </script>
 
 <template>
   <header>
-    <!-- <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" /> -->
+    <WeatherWidget />
   </header>
 
   <main>

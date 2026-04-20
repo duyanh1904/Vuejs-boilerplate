@@ -1,209 +1,245 @@
 <template>
-  <!-- Xóa min-h-screen để component ôm vừa với layout của App.vue -->
-  <div class="bg-slate-50 py-8 px-4 font-sans text-slate-800 rounded-xl w-full">
-    <div class="max-w-4xl mx-auto space-y-6">
-      
-      <!-- Bỏ Header ở đây vì App.vue đã có Header, hoặc giữ lại tùy ý bạn. -->
-
-      <!-- Dashboard Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <!-- Số dư -->
-        <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col items-center justify-center relative overflow-hidden">
-          <div class="absolute top-0 w-full h-1 bg-blue-500"></div>
-          <p class="text-sm font-medium text-slate-500 mb-1">Tổng Số Dư</p>
-          <p class="text-2xl font-bold text-slate-800">{{ formatCurrency(store.balance) }}</p>
-        </div>
-        
-        <!-- Tổng Thu -->
-        <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col items-center justify-center relative overflow-hidden">
-          <div class="absolute top-0 w-full h-1 bg-emerald-500"></div>
-          <p class="text-sm font-medium text-slate-500 mb-1">Tổng Thu Nhập</p>
-          <p class="text-2xl font-bold text-emerald-600">+{{ formatCurrency(store.totalIncome) }}</p>
-        </div>
-
-        <!-- Tổng Chi -->
-        <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col items-center justify-center relative overflow-hidden">
-          <div class="absolute top-0 w-full h-1 bg-rose-500"></div>
-          <p class="text-sm font-medium text-slate-500 mb-1">Tổng Chi Tiêu</p>
-          <p class="text-2xl font-bold text-rose-600">-{{ formatCurrency(store.totalExpense) }}</p>
-        </div>
-      </div>
-
-      <!-- Main Content Grid -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
-        <!-- Left Column: Form Thêm Giao Dịch -->
-        <div class="lg:col-span-1 space-y-6">
-          <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
-            <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
-              <svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-500"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
-              Ghi chép mới
-            </h2>
-            
-            <form @submit.prevent="submitForm" class="space-y-4">
-              <!-- Loại giao dịch -->
-              <div class="flex rounded-lg overflow-hidden border border-slate-200">
-                <button 
-                  type="button"
-                  @click="formType = 'expense'"
-                  class="flex-1 py-2 text-sm font-medium transition-colors"
-                  :class="formType === 'expense' ? 'bg-rose-500 text-white' : 'bg-slate-50 text-slate-600 hover:bg-slate-100'"
-                >
-                  Khoản Chi
-                </button>
-                <button 
-                  type="button"
-                  @click="formType = 'income'"
-                  class="flex-1 py-2 text-sm font-medium transition-colors"
-                  :class="formType === 'income' ? 'bg-emerald-500 text-white' : 'bg-slate-50 text-slate-600 hover:bg-slate-100'"
-                >
-                  Khoản Thu
-                </button>
-              </div>
-
-              <!-- Ngày tháng -->
-              <div>
-                <label class="block text-xs font-medium text-slate-500 mb-1">Ngày</label>
-                <input 
-                  type="date" 
-                  v-model="formDate" 
-                  class="w-full px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                  required
-                />
-              </div>
-
-              <!-- Số tiền -->
-              <div>
-                <label class="block text-xs font-medium text-slate-500 mb-1">Số tiền (VNĐ)</label>
-                <input 
-                  type="number" 
-                  v-model="formAmount" 
-                  placeholder="0"
-                  min="1"
-                  class="w-full px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                  required
-                />
-              </div>
-
-              <!-- Mô tả -->
-              <div>
-                <label class="block text-xs font-medium text-slate-500 mb-1">Mô tả</label>
-                <input 
-                  type="text" 
-                  v-model="formDescription" 
-                  placeholder="Ví dụ: Ăn trưa, Nhận lương..."
-                  class="w-full px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                  required
-                />
-              </div>
-
-              <!-- Error Message -->
-              <div v-if="errorMessage" class="p-3 bg-red-50 text-red-600 text-xs rounded-lg">
-                {{ errorMessage }}
-              </div>
-
-              <button 
-                type="submit" 
-                class="w-full py-2.5 rounded-lg text-white font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2"
-                :class="formType === 'income' ? 'bg-emerald-600 hover:bg-emerald-700 focus:ring-emerald-500' : 'bg-rose-600 hover:bg-rose-700 focus:ring-rose-500'"
-              >
-                Thêm giao dịch
-              </button>
-            </form>
-          </div>
-        </div>
-
-        <!-- Right Column: Báo Cáo & Lịch Sử -->
-        <div class="lg:col-span-2 space-y-6">
+  <div class="bg-slate-50 min-h-screen w-full font-sans text-slate-800 pb-12">
+    
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-20 shadow-sm">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+          <h1 class="text-xl font-bold text-slate-900 hidden sm:block">Quản Lý Chi Tiêu</h1>
           
-          <!-- Báo Cáo Trực Quan (Progress Bar) -->
-          <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
-            <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
-              <svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-500"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
-              Báo cáo nhanh
-            </h2>
-            <div class="space-y-4">
-              <div class="flex justify-between text-sm mb-1">
-                <span class="text-slate-500">Tỷ lệ Chi / Thu</span>
-                <span class="font-medium">{{ expenseRatio }}%</span>
-              </div>
-              <div class="w-full h-4 bg-slate-100 rounded-full overflow-hidden relative">
-                <div 
-                  class="absolute top-0 left-0 h-full bg-rose-500 transition-all duration-500"
-                  :style="{ width: `${expenseRatio}%` }"
-                ></div>
-                <!-- Vạch mức 100% (Thu nhập) -->
-                <div class="absolute top-0 left-0 h-full w-full bg-emerald-500 opacity-20 pointer-events-none"></div>
-              </div>
-              <p class="text-xs text-slate-500 text-right">
-                *Thanh màu đỏ thể hiện mức chi tiêu so với tổng thu nhập.
-              </p>
-            </div>
-          </div>
-
-          <!-- Lịch Sử Giao Dịch -->
-          <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-            <div class="p-6 border-b border-slate-100 flex justify-between items-center">
-              <h2 class="text-lg font-semibold flex items-center gap-2">
-                <svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-500"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
-                Lịch sử gần đây
-              </h2>
-            </div>
-            
-            <div class="p-0">
-              <div v-if="store.transactions.length === 0" class="p-8 text-center text-slate-500">
-                Chưa có dữ liệu giao dịch nào.
-              </div>
-              <ul v-else class="divide-y divide-slate-100">
-                <li 
-                  v-for="transaction in sortedTransactions" 
-                  :key="transaction.id"
-                  class="p-4 hover:bg-slate-50 flex items-center justify-between group transition-colors"
-                >
-                  <div class="flex items-center gap-4">
-                    <div 
-                      class="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
-                      :class="transaction.type === 'income' ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600'"
-                    >
-                      <svg v-if="transaction.type === 'income'" xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>
-                      <svg v-else xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
-                    </div>
-                    <div>
-                      <p class="font-medium text-slate-800">{{ transaction.description }}</p>
-                      <p class="text-xs text-slate-500">{{ formatDate(transaction.date) }}</p>
-                    </div>
-                  </div>
-                  
-                  <div class="flex items-center gap-4">
-                    <span 
-                      class="font-semibold whitespace-nowrap"
-                      :class="transaction.type === 'income' ? 'text-emerald-600' : 'text-rose-600'"
-                    >
-                      {{ transaction.type === 'income' ? '+' : '-' }}{{ formatCurrency(transaction.amount) }}
-                    </span>
-                    <button 
-                      @click="deleteItem(transaction.id)"
-                      class="text-slate-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
-                      title="Xóa"
-                    >
-                      <svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
-                    </button>
-                  </div>
-                </li>
-              </ul>
-            </div>
-          </div>
-
+          <nav class="flex space-x-1 sm:space-x-4 w-full sm:w-auto">
+            <button 
+              @click="activeTab = 'home'"
+              class="flex-1 sm:flex-none px-4 py-4 text-sm font-medium border-b-2 transition-colors duration-200 text-center"
+              :class="activeTab === 'home' ? 'border-blue-500 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'"
+            >
+              Ghi chép
+            </button>
+            <button 
+              @click="activeTab = 'report'"
+              class="flex-1 sm:flex-none px-4 py-4 text-sm font-medium border-b-2 transition-colors duration-200 text-center"
+              :class="activeTab === 'report' ? 'border-blue-500 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'"
+            >
+              Báo cáo chi tiết
+            </button>
+          </nav>
         </div>
       </div>
-    </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 space-y-8">
+      
+      <div v-show="activeTab === 'home'" class="space-y-8 animate-fade-in">
+        
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          <div class="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-slate-100 flex flex-col justify-center relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-1 bg-blue-500"></div>
+            <p class="text-sm font-medium text-slate-500 mb-2">Tổng Số Dư</p>
+            <p class="text-3xl font-bold text-slate-800 tracking-tight">{{ formatCurrency(store.balance) }}</p>
+          </div>
+          
+          <div class="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-slate-100 flex flex-col justify-center relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-1 bg-emerald-500"></div>
+            <p class="text-sm font-medium text-slate-500 mb-2">Tổng Thu Nhập</p>
+            <p class="text-2xl font-bold text-emerald-600 tracking-tight">+{{ formatCurrency(store.totalIncome) }}</p>
+          </div>
+
+          <div class="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-slate-100 flex flex-col justify-center relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-1 bg-rose-500"></div>
+            <p class="text-sm font-medium text-slate-500 mb-2">Tổng Chi Tiêu</p>
+            <p class="text-2xl font-bold text-rose-600 tracking-tight">-{{ formatCurrency(store.totalExpense) }}</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          
+          <div class="lg:col-span-5 space-y-6">
+            <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-100">
+              <h2 class="text-xl font-semibold mb-6 text-slate-800">Thêm giao dịch</h2>
+              
+              <form @submit.prevent="submitForm" class="space-y-5">
+                <div class="flex rounded-xl overflow-hidden bg-slate-100 p-1">
+                  <button 
+                    type="button"
+                    @click="formType = 'expense'"
+                    class="flex-1 py-3 text-sm font-semibold rounded-lg transition-all"
+                    :class="formType === 'expense' ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'"
+                  >
+                    Khoản Chi
+                  </button>
+                  <button 
+                    type="button"
+                    @click="formType = 'income'"
+                    class="flex-1 py-3 text-sm font-semibold rounded-lg transition-all"
+                    :class="formType === 'income' ? 'bg-white text-emerald-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'"
+                  >
+                    Khoản Thu
+                  </button>
+                </div>
+
+                <div class="space-y-4">
+                  <div>
+                    <label class="block text-sm font-medium text-slate-600 mb-1.5">Ngày giao dịch</label>
+                    <input 
+                      type="date" 
+                      v-model="formDate" 
+                      class="w-full px-4 py-3 bg-slate-50 rounded-xl border border-slate-200 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label class="block text-sm font-medium text-slate-600 mb-1.5">Số tiền (VNĐ)</label>
+                    <input 
+                      type="number" 
+                      v-model="formAmount" 
+                      placeholder="Nhập số tiền..."
+                      min="1"
+                      class="w-full px-4 py-3 bg-slate-50 rounded-xl border border-slate-200 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors text-lg font-medium"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label class="block text-sm font-medium text-slate-600 mb-1.5">Mô tả</label>
+                    <input 
+                      type="text" 
+                      v-model="formDescription" 
+                      placeholder="Ví dụ: Ăn sáng, Đổ xăng..."
+                      class="w-full px-4 py-3 bg-slate-50 rounded-xl border border-slate-200 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div v-if="errorMessage" class="p-4 bg-red-50/50 border border-red-100 text-red-600 text-sm rounded-xl">
+                  {{ errorMessage }}
+                </div>
+
+                <button 
+                  type="submit" 
+                  class="w-full py-3.5 rounded-xl text-white font-semibold text-lg transition-all active:scale-[0.98]"
+                  :class="formType === 'income' ? 'bg-emerald-500 hover:bg-emerald-600 shadow-emerald-500/25 shadow-lg' : 'bg-rose-500 hover:bg-rose-600 shadow-rose-500/25 shadow-lg'"
+                >
+                  Xác nhận lưu
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <div class="lg:col-span-7">
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden h-full flex flex-col">
+              <div class="p-6 sm:p-8 border-b border-slate-100 flex justify-between items-center bg-white">
+                <h2 class="text-xl font-semibold text-slate-800">Lịch sử gần đây</h2>
+              </div>
+              
+              <div class="p-0 overflow-y-auto max-h-[500px]">
+                <div v-if="store.transactions.length === 0" class="p-12 text-center text-slate-400">
+                  <p>Chưa có giao dịch nào.</p>
+                  <p class="text-sm mt-1">Hãy thêm khoản thu/chi đầu tiên của bạn!</p>
+                </div>
+                
+                <ul v-else class="divide-y divide-slate-50">
+                  <li 
+                    v-for="transaction in sortedTransactions" 
+                    :key="transaction.id"
+                    class="p-4 sm:p-6 hover:bg-slate-50 flex items-center justify-between group transition-colors"
+                  >
+                    <div class="flex items-center gap-4 sm:gap-5">
+                      <div 
+                        class="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0"
+                        :class="transaction.type === 'income' ? 'bg-emerald-50 text-emerald-500' : 'bg-rose-50 text-rose-500'"
+                      >
+                        <svg v-if="transaction.type === 'income'" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>
+                        <svg v-else xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+                      </div>
+                      <div>
+                        <p class="font-semibold text-slate-800 text-base">{{ transaction.description }}</p>
+                        <p class="text-sm text-slate-500 mt-0.5">{{ formatDate(transaction.date) }}</p>
+                      </div>
+                    </div>
+                    
+                    <div class="flex items-center gap-4">
+                      <span 
+                        class="font-bold text-base sm:text-lg whitespace-nowrap"
+                        :class="transaction.type === 'income' ? 'text-emerald-600' : 'text-rose-600'"
+                      >
+                        {{ transaction.type === 'income' ? '+' : '-' }}{{ formatCurrency(transaction.amount) }}
+                      </span>
+                      <button 
+                        @click="deleteItem(transaction.id)"
+                        class="p-2 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition-all sm:opacity-0 group-hover:opacity-100 focus:opacity-100"
+                        title="Xóa"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                      </button>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div v-show="activeTab === 'report'" class="space-y-8 animate-fade-in">
+        <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-100">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+            <h2 class="text-2xl font-bold text-slate-800">Thống kê dữ liệu</h2>
+            
+            <div class="flex space-x-2 bg-slate-100 p-1.5 rounded-xl">
+              <button 
+                v-for="period in ['week', 'month', 'year']" 
+                :key="period"
+                @click="reportFilter = period as 'week' | 'month' | 'year'"
+                class="px-4 py-2 text-sm font-semibold rounded-lg transition-all capitalize"
+                :class="reportFilter === period ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'"
+              >
+                {{ period === 'week' ? '7 Ngày qua' : period === 'month' ? 'Tháng này' : 'Năm nay' }}
+              </button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
+            <div class="p-6 rounded-2xl bg-emerald-50/50 border border-emerald-100">
+              <p class="text-sm font-medium text-emerald-600/80 mb-2">Tổng thu ({{ filterLabel }})</p>
+              <p class="text-3xl font-bold text-emerald-600">{{ formatCurrency(filteredStats.income) }}</p>
+            </div>
+            <div class="p-6 rounded-2xl bg-rose-50/50 border border-rose-100">
+              <p class="text-sm font-medium text-rose-600/80 mb-2">Tổng chi ({{ filterLabel }})</p>
+              <p class="text-3xl font-bold text-rose-600">{{ formatCurrency(filteredStats.expense) }}</p>
+            </div>
+          </div>
+
+          <div class="space-y-4 max-w-2xl">
+            <div class="flex justify-between text-sm mb-2">
+              <span class="font-medium text-slate-700">Tỷ lệ Chi / Thu</span>
+              <span class="font-bold" :class="filteredStats.ratio > 80 ? 'text-rose-500' : 'text-slate-700'">
+                {{ filteredStats.ratio }}%
+              </span>
+            </div>
+            <div class="w-full h-6 bg-slate-100 rounded-full overflow-hidden relative">
+              <div 
+                class="absolute top-0 left-0 h-full transition-all duration-700 rounded-full"
+                :class="filteredStats.ratio > 80 ? 'bg-rose-500' : 'bg-blue-500'"
+                :style="{ width: `${filteredStats.ratio}%` }"
+              ></div>
+            </div>
+            <p v-if="filteredStats.ratio > 100" class="text-sm text-rose-500 font-medium">
+              ⚠️ Cảnh báo: Bạn đã chi tiêu vượt quá thu nhập!
+            </p>
+          </div>
+        </div>
+      </div>
+
+    </main>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref, computed } from 'vue';
 import { useFinance } from '../composables/useFinance';
 
-// Gọi composable chứa toàn bộ logic
+// Gọi composable chứa logic gốc
 const {
   store,
   formType,
@@ -214,8 +250,24 @@ const {
   submitForm,
   deleteItem,
   sortedTransactions,
-  expenseRatio,
   formatCurrency,
-  formatDate
+  formatDate,
+  // Xuất thêm các biến UI & Report
+    activeTab,
+    reportFilter,
+    filterLabel,
+    filteredStats
 } = useFinance();
 </script>
+
+<style scoped>
+/* Hiệu ứng chuyển tab mượt mà */
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+</style>
