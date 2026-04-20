@@ -26,7 +26,7 @@
       </div>
     </header>
 
-    <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 space-y-8">
+    <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 space-y-8 pt-8">
       
       <div v-show="activeTab === 'home'" class="space-y-8 animate-fade-in">
         
@@ -50,7 +50,7 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 pt-8">
           
           <div class="lg:col-span-5 space-y-6">
             <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-100">
@@ -76,7 +76,7 @@
                   </button>
                 </div>
 
-                <div class="space-y-4">
+                <div class="space-y-4 pb-4">
                   <div>
                     <label class="block text-sm font-medium text-slate-600 mb-1.5">Ngày giao dịch</label>
                     <input 
