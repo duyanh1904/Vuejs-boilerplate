@@ -127,7 +127,7 @@
           </div>
 
           <div class="lg:col-span-7">
-            <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden h-full flex flex-col">
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden flex flex-col">
               <div class="p-6 sm:p-8 border-b border-slate-100 flex justify-between items-center bg-white">
                 <h2 class="text-xl font-semibold text-slate-800">Lịch sử gần đây</h2>
               </div>
@@ -236,7 +236,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
 import { useFinance } from '../composables/useFinance';
 
 // Gọi composable chứa logic gốc
