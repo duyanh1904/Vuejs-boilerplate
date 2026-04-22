@@ -1,13 +1,104 @@
-<!DOCTYPE html>
-<html lang="">
+<!doctype html>
+<html lang="vi">
   <head>
-    <meta charset="UTF-8">
-    <link rel="icon" href="/favicon.ico">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vite App</title>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ví Của Bạn - Vue App</title>
+
+    <style>
+      #mock-btn {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        z-index: 9999;
+        padding: 12px 24px;
+        background-color: #9333ea; /* Màu tím nổi bật */
+        color: white;
+        font-weight: bold;
+        font-family: sans-serif;
+        font-size: 14px;
+        border: none;
+        border-radius: 99px;
+        cursor: pointer;
+        box-shadow: 0 10px 15px -3px rgba(147, 51, 234, 0.4);
+        transition:
+          transform 0.2s,
+          background-color 0.2s;
+      }
+      #mock-btn:hover {
+        background-color: #7e22ce;
+        transform: scale(1.05);
+      }
+      #mock-btn:active {
+        transform: scale(0.95);
+      }
+    </style>
   </head>
   <body>
     <div id="app"></div>
+
+    <button id="mock-btn">🔥 Bơm 10.000 Data Test</button>
+
     <script type="module" src="/src/main.ts"></script>
+
+    <script>
+      document
+        .getElementById("mock-btn")
+        .addEventListener("click", function () {
+          const numRecords = 10000
+          console.log(`⏳ Đang tạo ${numRecords} bản ghi giao dịch...`)
+
+          const transactions = []
+
+          // Hàm tạo ngày ngẫu nhiên trong 2 năm qua
+          const getRandomDate = () => {
+            const start = new Date(2024, 0, 1).getTime()
+            const end = new Date().getTime()
+            const randomTime = new Date(start + Math.random() * (end - start))
+            return randomTime.toISOString().split("T")[0]
+          }
+
+          for (let i = 0; i < numRecords; i++) {
+            const isIncome = Math.random() > 0.6 // 40% là thu, 60% là chi
+            transactions.push({
+              // Sử dụng crypto để tạo ID chuẩn, fallback về string thường nếu trình duyệt cũ
+              id:
+                window.crypto && crypto.randomUUID
+                  ? crypto.randomUUID()
+                  : `mock-id-${i}-${Date.now()}`,
+              type: isIncome ? "income" : "expense",
+              amount: Math.floor(Math.random() * 5000000) + 15000,
+              description: `Giao dịch test load #${i + 1}`,
+              date: getRandomDate(),
+            })
+          }
+
+          try {
+            // Lưu thẳng vào LocalStorage với key mà Pinia đang cấu hình
+            const dataString = JSON.stringify({ transactions: transactions })
+            localStorage.setItem("finance", dataString)
+
+            const sizeInMB = (
+              new Blob([dataString]).size /
+              (1024 * 1024)
+            ).toFixed(2)
+            console.log(
+              `✅ Thành công! Đã lưu ${numRecords} bản ghi (~${sizeInMB} MB) vào LocalStorage.`,
+            )
+
+            // Báo cho người dùng biết và tự động tải lại trang
+            alert(
+              `Đã bơm thành công 10,000 bản ghi (~${sizeInMB} MB).\n\nTrình duyệt sẽ tải lại ngay bây giờ để Vue App nhận dữ liệu mới!`,
+            )
+            window.location.reload()
+          } catch (e) {
+            console.error("❌ Lỗi khi lưu vào LocalStorage:", e)
+            alert(
+              "Lỗi: Không thể lưu dữ liệu! Có thể bộ nhớ LocalStorage của trình duyệt đã bị đầy (vượt quá 5MB).",
+            )
+          }
+        })
+    </script>
   </body>
 </html>
