@@ -35,6 +35,12 @@ npm install
 npm run dev
 ```
 
+### Run test
+
+```sh
+npm run test
+```
+
 ### Type-Check, Compile and Minify for Production
 
 ```sh
