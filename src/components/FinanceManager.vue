@@ -1,7 +1,7 @@
 <template>
   <div class="bg-slate-50 min-h-screen w-full font-sans text-slate-800 pb-12">
     
-    <header class="bg-white border-b border-slate-200 sticky top-0 z-20 shadow-sm">
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-20 shadow-sm rounded-xl">
       <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16">
           <h1 class="text-xl font-bold text-slate-900 hidden sm:block">Quản Lý Chi Tiêu</h1>
@@ -26,7 +26,7 @@
       </div>
     </header>
 
-    <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 space-y-8 pt-8">
+    <main class="pt-8">
       
       <div v-show="activeTab === 'home'" class="space-y-8 animate-fade-in">
         
@@ -199,7 +199,7 @@
             </div>
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8 pt-8">
             <div class="p-6 rounded-2xl bg-emerald-50/50 border border-emerald-100">
               <p class="text-sm font-medium text-emerald-600/80 mb-2">Tổng thu ({{ filterLabel }})</p>
               <p class="text-3xl font-bold text-emerald-600">{{ formatCurrency(filteredStats.income) }}</p>
@@ -210,7 +210,7 @@
             </div>
           </div>
 
-          <div class="space-y-4 max-w-2xl">
+          <div class="space-y-10 max-w-2xl pt-8">
             <div class="flex justify-between text-sm mb-2">
               <span class="font-medium text-slate-700">Tỷ lệ Chi / Thu</span>
               <span class="font-bold" :class="filteredStats.ratio > 80 ? 'text-rose-500' : 'text-slate-700'">
