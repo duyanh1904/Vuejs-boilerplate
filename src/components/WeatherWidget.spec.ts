@@ -2,6 +2,7 @@
 import { mount } from '@vue/test-utils';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import WeatherWidget from './WeatherWidget.vue';
+import { ref } from 'vue'; // Nhớ import ref
 
 // 1. Import module composable để có thể giả lập (mock) nó
 import * as useWeatherModule from '../composables/useWeather';
@@ -18,10 +19,11 @@ describe('Component: WeatherWidget.vue', () => {
     // Helper function giúp tạo dữ liệu giả lập cho từng test case nhanh hơn
     const setupMock = (overrides = {}) => {
         vi.mocked(useWeatherModule.useWeather).mockReturnValue({
-            weatherData: null,
-            isLoading: false,
-            isRefreshing: false,
-            error: '',
+            // Bọc các giá trị khởi tạo bằng ref() để tránh lỗi TS
+            weatherData: ref(null),
+            isLoading: ref(false),
+            isRefreshing: ref(false),
+            error: ref(''),
             getWeatherDescription: vi.fn(() => 'Mô tả giả lập'),
             getWeatherIcon: vi.fn(() => '☀️'),
             loadWeather: mockLoadWeather,
