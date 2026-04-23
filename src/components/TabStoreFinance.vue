@@ -151,6 +151,7 @@
 </template>
 
 <script setup lang="ts">
+import { onActivated, onDeactivated } from 'vue';
 import { useFinance } from '../composables/useFinance';
 
 const {
@@ -166,4 +167,17 @@ const {
   formatCurrency,
   formatDate,
 } = useFinance();
+
+// Lifecycle hooks available for future use when the component is wrapped with <KeepAlive>
+onActivated(() => {
+  // Runs when this tab component is activated from cache.
+  // Use this to refresh lightweight data or restart timers if needed.
+  if (import.meta.env.DEV) console.log('[TabStoreFinance] activated');
+});
+
+onDeactivated(() => {
+  // Runs when this tab component is deactivated and cached.
+  // Use this to pause background activity to save resources.
+  if (import.meta.env.DEV) console.log('[TabStoreFinance] deactivated');
+});
 </script>

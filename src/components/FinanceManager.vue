@@ -34,8 +34,11 @@
 import { useFinance } from '../composables/useFinance';
 import TabStoreFinance from "@/components/TabStoreFinance.vue";
 import TabReportFinance from "@/components/TabReportFinance.vue";
+import type { TabId } from '@/types/tabs';
+import type { Ref } from 'vue';
 
-const { activeTab } = useFinance();
+// Explicitly type the shared activeTab ref for clarity
+const { activeTab } = useFinance() as { activeTab: Ref<TabId> };
 </script>
 
 <style scoped>

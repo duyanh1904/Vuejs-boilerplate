@@ -1,6 +1,12 @@
 import { ref, computed } from 'vue'; // Đã xóa onMounted vì không còn cần thiết
 import { useFinanceStore } from '../stores/financeStore';
 import type { TransactionType } from '../types/finance';
+import type { TabId, ReportFilterPeriod } from '../types/tabs';
+
+// Module-level singletons shared across all consumers of the composable
+// (keeps a single source of truth for tab state and report filter)
+const activeTab = ref<TabId>('home');
+const reportFilter = ref<ReportFilterPeriod>('month');
 
 export function useFinance() {
   const store = useFinanceStore();
@@ -56,8 +62,9 @@ export function useFinance() {
   // ==========================================
   // 2. STATE QUẢN LÝ GIAO DIỆN (UI) & BÁO CÁO
   // ==========================================
-  const activeTab = ref<'home' | 'report'>('home');
-  const reportFilter = ref<'week' | 'month' | 'year'>('month');
+  // NOTE: `activeTab` and `reportFilter` are defined at module scope
+  // (see top of file) so they act as singletons shared across all
+  // consumers of this composable.
 
   const filterLabel = computed(() => {
     if (reportFilter.value === 'week') return '7 ngày qua';
