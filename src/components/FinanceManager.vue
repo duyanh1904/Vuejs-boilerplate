@@ -17,6 +17,11 @@
               :class="activeTab === 'report' ? 'border-blue-500 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'">
               Báo cáo chi tiết
             </button>
+            <button @click="activeTab = 'gold'"
+              class="flex-1 sm:flex-none px-4 py-4 text-sm font-medium border-b-2 transition-colors duration-200 text-center"
+              :class="activeTab === 'gold' ? 'border-blue-500 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'">
+              Giá Vàng
+            </button>
           </nav>
         </div>
       </div>
@@ -24,7 +29,7 @@
 
     <main class="pt-8">
       <KeepAlive>
-        <component :is="activeTab === 'home' ? TabStoreFinance : TabReportFinance" />
+        <component :is="tabComponents[activeTab]" />
       </KeepAlive>
     </main>
   </div>
@@ -34,10 +39,14 @@
 import { useFinance } from '../composables/useFinance';
 import TabStoreFinance from "@/components/TabStoreFinance.vue";
 import TabReportFinance from "@/components/TabReportFinance.vue";
+import GoldChart from './GoldChart.vue';
 import type { TabId } from '@/types/tabs';
 import type { Ref } from 'vue';
-
-// Explicitly type the shared activeTab ref for clarity
+const tabComponents:Record<string, any> = {
+  home: TabStoreFinance,
+  report: TabReportFinance,
+  gold: GoldChart
+};
 const { activeTab } = useFinance() as { activeTab: Ref<TabId> };
 </script>
 

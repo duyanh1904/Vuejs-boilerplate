@@ -52,7 +52,6 @@
 import { onActivated, onDeactivated } from 'vue';
 import { useFinance } from '../composables/useFinance';
 import type { ReportFilterPeriod } from '@/types/tabs';
-import type { Ref } from 'vue';
 
 const {
   formatCurrency,
