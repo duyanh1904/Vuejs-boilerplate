@@ -101,7 +101,7 @@
           <h2 class="text-xl font-semibold text-slate-800">Lịch sử gần đây</h2>
         </div>
 
-        <div class="p-0 overflow-y-auto max-h-[500px]">
+        <div class="p-0 overflow-y-auto max-h-125">
           <div v-if="store.transactions.length === 0" class="p-12 text-center text-slate-400">
             <p>Chưa có giao dịch nào.</p>
             <p class="text-sm mt-1">Hãy thêm khoản thu/chi đầu tiên của bạn!</p>
