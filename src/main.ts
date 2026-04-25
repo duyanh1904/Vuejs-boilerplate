@@ -1,8 +1,8 @@
-import './assets/main.css'
-import { createApp } from 'vue'
-import { createPinia } from 'pinia' 
-import App from './App.vue'
-import piniaPluginPersistence from 'pinia-plugin-persistedstate'
+import "./assets/main.css"
+import { createApp } from "vue"
+import { createPinia } from "pinia"
+import App from "./App.vue"
+import piniaPluginPersistence from "pinia-plugin-persistedstate"
 
 // 1. Khởi tạo một instance DUY NHẤT của ứng dụng
 const app = createApp(App)
@@ -12,4 +12,4 @@ pinia.use(piniaPluginPersistence)
 app.use(pinia)
 
 // 3. Cuối cùng mới mount ứng dụng lên giao diện
-app.mount('#app')
+app.mount("#app")

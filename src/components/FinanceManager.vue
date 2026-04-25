@@ -42,7 +42,7 @@ import TabReportFinance from "@/components/TabReportFinance.vue";
 import GoldChart from './GoldChart.vue';
 import type { TabId } from '@/types/tabs';
 import type { Ref } from 'vue';
-const tabComponents:Record<string, any> = {
+const tabComponents: Record<string, any> = {
   home: TabStoreFinance,
   report: TabReportFinance,
   gold: GoldChart

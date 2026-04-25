@@ -1,4 +1,4 @@
-@import './base.css';
+@import "./base.css";
 
 a,
 .green {
@@ -29,15 +29,23 @@ a,
 /* Tạo class tiện ích để gọi hiệu ứng */
 .animate-slide-down {
   /* Mặc định tàng hình trước khi chạy hiệu ứng */
-  opacity: 0; 
+  opacity: 0;
   /* Chạy trong 0.6s, gia tốc mượt (cubic-bezier), giữ nguyên trạng thái cuối (forwards) */
   animation: slideDownFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 /* Các class tạo độ trễ (delay) để các khối xuất hiện lần lượt */
-.delay-100 { animation-delay: 100ms; }
-.delay-200 { animation-delay: 200ms; }
-.delay-300 { animation-delay: 300ms; }
-.delay-400 { animation-delay: 400ms; }
+.delay-100 {
+  animation-delay: 100ms;
+}
+.delay-200 {
+  animation-delay: 200ms;
+}
+.delay-300 {
+  animation-delay: 300ms;
+}
+.delay-400 {
+  animation-delay: 400ms;
+}
 
 @import "tailwindcss";
