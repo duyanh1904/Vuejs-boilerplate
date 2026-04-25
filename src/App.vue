@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import FinanceManager from './components/FinanceManager.vue'
 import WeatherWidget from './components/WeatherWidget.vue';
+import ChatBox from "@/components/ChatBox.vue";
 </script>
 
 <template>
@@ -20,6 +21,7 @@ import WeatherWidget from './components/WeatherWidget.vue';
     <main class="w-1/2 mx-auto py-8 flex-1 animate-slide-down delay-200">
       <FinanceManager />
     </main>
+    <ChatBox />
 
   </div>
 </template>
