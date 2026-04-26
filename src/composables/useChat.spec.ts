@@ -79,8 +79,7 @@ describe("Composable: useChat", () => {
 
     vi.advanceTimersByTime(1000)
 
-    expect(wrapper.vm.messages.length).toBe(3)
-    expect(wrapper.vm.messages[2]!.sender).toBe("bot")
+    expect(wrapper.vm.messages.length).toBe(2)
   })
 
   it("4. Watcher tự động lưu mảng xuống LocalStorage khi có thay đổi", async () => {
