@@ -27,9 +27,21 @@
         Chưa có tin nhắn nào. Hãy bắt đầu trò chuyện!
       </div>
 
-      <div v-for="msg in messages" :key="msg.id" class="max-w-[80%] rounded-2xl px-4 py-2 text-sm shadow-sm"
-        :class="msg.sender === 'user' ? 'bg-blue-600 text-white self-end rounded-br-sm' : 'bg-white border border-slate-200 text-slate-700 self-start rounded-bl-sm'">
-        {{ msg.text }}
+      <div v-for="msg in messages" :key="msg.id"
+           class="max-w-[80%] rounded-2xl px-4 py-2 text-sm shadow-sm"
+           :class="msg.sender === 'user' ? 'bg-blue-600 text-white self-end rounded-br-sm' : 'bg-white border border-slate-200 text-slate-700 self-start rounded-bl-sm'">
+
+        <template v-if="msg.sender === 'user'">
+          {{ msg.text }}
+        </template>
+
+        <template v-else>
+          <div
+              v-html="msg.text"
+              class="prose prose-sm prose-slate max-w-none ai-content"
+          ></div>
+        </template>
+
       </div>
     </div>
 

@@ -1,7 +1,8 @@
 // file: src/composables/useChat.ts
 import { ref, watch, nextTick, onMounted } from "vue"
+// 1. Nhập Google Generative AI SDK
+import { GoogleGenerativeAI } from "@google/generative-ai"
 
-// 1. Định nghĩa Type rõ ràng (Type Safety)
 export interface Message {
   id: number
   text: string
@@ -9,9 +10,12 @@ export interface Message {
   timestamp: number
 }
 
-// 2. Tách hằng số tránh hardcode (Clean Code)
 const STORAGE_KEY = "finance_chat_history"
-const BOT_DELAY_MS = 1000
+
+// 2. Khởi tạo Gemini AI bên ngoài composable để tránh tạo lại nhiều lần
+// Nhớ đảm bảo bạn đã tạo file .env.local và có VITE_AI_API_KEY
+const apiKey = import.meta.env.VITE_AI_API_KEY || ""
+const genAI = new GoogleGenerativeAI(apiKey)
 
 export function useChat() {
   // ==========================================
@@ -22,6 +26,9 @@ export function useChat() {
   const messages = ref<Message[]>([])
   const chatContainer = ref<HTMLElement | null>(null)
 
+  // Thêm state isLoading để quản lý trạng thái chờ AI phản hồi
+  const isLoading = ref(false)
+
   // ==========================================
   // CÁC HÀM XỬ LÝ LOGIC (ACTIONS)
   // ==========================================
@@ -30,7 +37,6 @@ export function useChat() {
     if (savedHistory) {
       messages.value = JSON.parse(savedHistory)
     } else {
-      // Tin nhắn mặc định nếu chưa từng chat
       messages.value = [
         {
           id: Date.now(),
@@ -43,15 +49,17 @@ export function useChat() {
   }
 
   const scrollToBottom = async () => {
-    await nextTick() // Chờ DOM cập nhật
+    await nextTick()
     if (chatContainer.value) {
       chatContainer.value.scrollTop = chatContainer.value.scrollHeight
     }
   }
 
-  const sendMessage = () => {
+  // 3. Chuyển hàm thành async để xử lý API call
+  const sendMessage = async () => {
     const text = inputText.value.trim()
-    if (!text) return
+    // Chặn gửi nếu input rỗng hoặc đang chờ AI trả lời
+    if (!text || isLoading.value) return
 
     // 1. Đẩy tin nhắn của User vào
     messages.value.push({
@@ -65,16 +73,40 @@ export function useChat() {
     inputText.value = ""
     scrollToBottom()
 
-    // 3. Giả lập Bot phản hồi sau khoảng trễ
-    setTimeout(() => {
+    // 3. Gọi Gemini AI
+    isLoading.value = true // Bật trạng thái loading
+
+    try {
+      if (!apiKey) throw new Error("Thiếu API Key")
+
+      // Khởi tạo model (sử dụng gemini-1.5-flash cho tốc độ phản hồi nhanh)
+      const model = genAI.getGenerativeModel({ model: "gemini-3-flash-preview" })
+
+      // Gửi prompt tới AI
+      const result = await model.generateContent(text)
+      const responseText = result.response.text()
+
+      // Đẩy tin nhắn của AI vào
       messages.value.push({
-        id: Date.now() + 1,
-        text: `Tôi đã ghi nhận yêu cầu: "${text}". Tính năng AI đang được nâng cấp!`,
+        id: Date.now(),
+        text: responseText,
         sender: "bot",
         timestamp: Date.now(),
       })
+
+    } catch (error) {
+      console.error("Lỗi khi gọi AI:", error)
+      messages.value.push({
+        id: Date.now(),
+        text: "Xin lỗi, đã có lỗi xảy ra khi kết nối với hệ thống. Vui lòng thử lại sau.",
+        sender: "bot",
+        timestamp: Date.now(),
+      })
+    } finally {
+      // 4. Tắt loading và cuộn xuống cuối cùng dù thành công hay thất bại
+      isLoading.value = false
       scrollToBottom()
-    }, BOT_DELAY_MS)
+    }
   }
 
   // ==========================================
@@ -85,13 +117,12 @@ export function useChat() {
     scrollToBottom()
   })
 
-  // Tự động lưu lịch sử hễ mảng messages có sự thay đổi
   watch(
-    messages,
-    (newVal) => {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(newVal))
-    },
-    { deep: true },
+      messages,
+      (newVal) => {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(newVal))
+      },
+      { deep: true },
   )
 
   // ==========================================
@@ -102,6 +133,7 @@ export function useChat() {
     inputText,
     messages,
     chatContainer,
+    isLoading, // Export thêm isLoading để UI có thể disable nút gửi
     sendMessage,
   }
 }
