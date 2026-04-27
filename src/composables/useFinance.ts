@@ -131,6 +131,101 @@ export function useFinance() {
     return date.toLocaleDateString("vi-VN")
   }
 
+  // ==========================================
+  // THÊM MỚI: Dữ liệu cho Biểu đồ Chart.js (Theo 12 tháng của năm hiện tại)
+  // ==========================================
+  const monthlyChartData = computed(() => {
+    const currentYear = new Date().getFullYear();
+    const incomes = new Array(12).fill(0);
+    const expenses = new Array(12).fill(0);
+
+    // Duyệt qua toàn bộ giao dịch, nhặt ra các giao dịch trong năm nay
+    store.transactions.forEach((t) => {
+      const d = new Date(t.date);
+      if (d.getFullYear() === currentYear) {
+        const monthIndex = d.getMonth(); // Trả về từ 0 (Tháng 1) đến 11 (Tháng 12)
+        if (t.type === 'income') {
+          incomes[monthIndex] += t.amount;
+        } else {
+          expenses[monthIndex] += t.amount;
+        }
+      }
+    });
+
+    // Trả về cấu trúc Data chuẩn mực mà Chart.js yêu cầu
+    return {
+      labels: ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12'],
+      datasets: [
+        {
+          label: 'Thu nhập',
+          backgroundColor: '#10b981', // Màu emerald-500 của Tailwind
+          data: incomes,
+          borderRadius: 4, // Bo góc cho cột đẹp hơn
+        },
+        {
+          label: 'Chi tiêu',
+          backgroundColor: '#f43f5e', // Màu rose-500 của Tailwind
+          data: expenses,
+          borderRadius: 4,
+        }
+      ]
+    };
+  });
+
+  // ==========================================
+// CẤU HÌNH GIAO DIỆN CHART.JS
+// ==========================================
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false, // Bắt buộc false để thẻ cha điều khiển độ cao (h-80)
+    interaction: {
+      mode: 'index' as const, // Hiển thị tooltip của cả Cột Thu & Chi cùng lúc khi trỏ chuột vào tháng
+      intersect: false,
+    },
+    plugins: {
+      legend: {
+        position: 'bottom' as const,
+        labels: {
+          usePointStyle: true, // Biến ô vuông chú thích thành hình tròn nhỏ cho hiện đại
+          padding: 20
+        }
+      },
+      tooltip: {
+        backgroundColor: 'rgba(15, 23, 42, 0.9)',
+        padding: 12,
+        callbacks: {
+          // Tùy biến Tooltip để hiển thị tiền có chữ "đ" chuẩn Việt Nam
+          label: (context: any) => {
+            let label = context.dataset.label || '';
+            if (label) {
+              label += ': ';
+            }
+            if (context.parsed.y !== null) {
+              label += formatCurrency(context.parsed.y);
+            }
+            return label;
+          }
+        }
+      }
+    },
+    scales: {
+      x: {
+        grid: { display: false } // Xóa kẻ sọc dọc cho UI sạch sẽ
+      },
+      y: {
+        border: { display: false },
+        grid: { color: '#f1f5f9' },
+        ticks: {
+          // Tùy biến trục Y: Chia cho 1 Triệu để nhãn (label) không bị dài loằng ngoằng
+          callback: (value: any) => {
+            if (value === 0) return '0';
+            return (Number(value) / 1000000) + ' Tr';
+          }
+        }
+      }
+    }
+  };
+
   return {
     store, // Trả về store để template có thể gọi store.totalIncome, store.balance...
     formType,
@@ -145,6 +240,8 @@ export function useFinance() {
     formatDate,
 
     activeTab,
+    monthlyChartData,
+    chartOptions,
     reportFilter,
     filterLabel,
     filteredStats,
