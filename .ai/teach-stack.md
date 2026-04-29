@@ -5,12 +5,18 @@
 - **TypeScript**: Bật chế độ Strict Mode. Ưu tiên khai báo `interface` rõ ràng. Dùng Non-null assertion (`!`) khi truy xuất phần tử mảng có độ dài cố định.
 - **Build Tool**: Vite.
 
+## Routing & Navigation
+- **Vue Router**: Xử lý điều hướng chuẩn SPA (Single Page Application).
+  - Sử dụng **Dynamic Route** (`/:id`) để tái sử dụng Component cho các trang chi tiết.
+  - Tổ chức **Nested Route** (`children`) cho các Layout lồng nhau (VD: Layout có Sidebar/Header cố định).
+  - Áp dụng **Navigation Guards** (`beforeEach`, vv.) như một "trạm kiểm soát" để check logic/quyền truy cập trước khi cho phép vào trang.
+
 ## State Management
-- **Pinia**: Setup store dạng Composition API (dùng `ref` cho state, `computed` cho getters, `function` cho actions).
-- **Persistence**: Sử dụng `pinia-plugin-persistedstate`. Key mặc định lưu LocalStorage là tên của store.
+- **Pinia**: Setup store dạng Composition API (dùng `ref` cho state, `computed` cho getters, `function` cho actions). Không sửa state trực tiếp ngoài component.
+- **Persistence**: Sử dụng `pinia-plugin-persistedstate`. Key mặc định lưu LocalStorage là tên của store, dùng như một cơ chế sao lưu dự phòng chống F5.
 
 ## Styling & UI
-- **Tailwind CSS 4.0**: Sử dụng Utility-first. 
+- **Tailwind CSS 4.0**: Sử dụng Utility-first.
   - Thứ tự class: Layout (`flex`, `grid`) -> Kích thước (`w-`, `h-`) -> Typography (`text-`) -> Visual (`bg-`, `border`, `shadow-sm`) -> Trạng thái (`hover:`).
   - Không dùng màu đậm cho nền. Thường xuyên dùng `rounded-2xl` cho thẻ lớn và `shadow-sm`.
 
@@ -18,6 +24,6 @@
 - **Biểu đồ**: Dùng `Chart.js` kết hợp `vue-chartjs`. Áp dụng kỹ thuật Smooth Curve (`tension: 0.4`) và Gradient Fill qua Context 2D.
 - **Testing**: `Vitest` kết hợp `@vue/test-utils` và môi trường giả lập DOM `jsdom`.
 
-## Data Loading
-- Sử dụng `defineAsyncComponent` để Lazy load các component nặng (như biểu đồ).
-- API Client: Axios (Tương lai sẽ config interceptors).
+## Network & Data Loading
+- **API Client (Axios)**: Khởi tạo instance tập trung (`axios.create`). Áp dụng triệt để **Interceptors** để nhét Token tự động và xử lý lỗi global. Kết hợp `AbortController` (Signal) để hủy request thừa khi cần.
+- **Lazy Loading**: Sử dụng `defineAsyncComponent` để tải chậm các component nặng (như tab Biểu đồ).
