@@ -226,6 +226,32 @@ export function useFinance() {
     }
   };
 
+  // Vue shadcn table
+  const currentPage = ref(1);
+  const pageSize = ref(20);
+
+  // Tính toán mảng dữ liệu chỉ chứa 20 bản ghi của trang hiện tại
+  const paginatedTransactions = computed(() => {
+
+    const start = (currentPage.value - 1) * pageSize.value;
+    const end = start + pageSize.value;
+    return sortedTransactions.value.slice(start, end);
+  });
+
+  // Tính tổng số trang
+  const totalPages = computed(() => {
+    return Math.ceil(sortedTransactions.value.length / pageSize.value);
+  });
+
+  // Hàm chuyển trang
+  const setPage = (page: number) => {
+    if (page >= 1 && page <= totalPages.value) {
+      currentPage.value = page;
+      // Tự động cuộn lên đầu bảng khi chuyển trang (UX tốt)
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   return {
     store, // Trả về store để template có thể gọi store.totalIncome, store.balance...
     formType,
@@ -245,5 +271,9 @@ export function useFinance() {
     reportFilter,
     filterLabel,
     filteredStats,
+    currentPage,
+    paginatedTransactions,
+    totalPages,
+    setPage
   }
 }
