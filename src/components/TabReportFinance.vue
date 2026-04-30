@@ -71,8 +71,49 @@
       <div v-show="viewMode === 'table'" class="animate-slide-down">
         <div class="space-y-4">
           <Table>
+            <TableHeader class="bg-slate-50/80">
+              <TableRow>
+                <TableHead class="w-[120px]">Ngày</TableHead>
+                <TableHead>Mô tả</TableHead>
+                <TableHead class="text-center w-[120px]">Phân loại</TableHead>
+                <TableHead class="text-right w-[150px]">Số tiền</TableHead>
+              </TableRow>
+            </TableHeader>
+
             <TableBody>
-              <TableRow v-for="item in paginatedTransactions" :key="item.id">
+              <TableRow
+                  v-for="item in paginatedTransactions"
+                  :key="item.id"
+              >
+                <TableCell class="text-slate-500 font-medium">
+                  {{ formatDate(item.date) }}
+                </TableCell>
+
+                <TableCell class="font-medium text-slate-700">
+                  {{ item.description }}
+                </TableCell>
+
+                <TableCell class="text-center">
+          <span
+              class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide"
+              :class="item.type === 'income' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'"
+          >
+            {{ item.type === 'income' ? 'Thu' : 'Chi' }}
+          </span>
+                </TableCell>
+
+                <TableCell
+                    class="text-right font-bold"
+                    :class="item.type === 'income' ? 'text-emerald-600' : 'text-rose-600'"
+                >
+                  {{ item.type === 'income' ? '+' : '-' }}{{ formatCurrency(item.amount) }}
+                </TableCell>
+              </TableRow>
+
+              <TableRow v-if="!paginatedTransactions || paginatedTransactions.length === 0">
+                <TableCell colspan="4" class="h-24 text-center text-slate-500 font-medium">
+                  Chưa có dữ liệu giao dịch nào.
+                </TableCell>
               </TableRow>
             </TableBody>
           </Table>
