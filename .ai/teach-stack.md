@@ -23,7 +23,18 @@
 ## Libraries
 - **Biểu đồ**: Dùng `Chart.js` kết hợp `vue-chartjs`. Áp dụng kỹ thuật Smooth Curve (`tension: 0.4`) và Gradient Fill qua Context 2D.
 - **Testing**: `Vitest` kết hợp `@vue/test-utils` và môi trường giả lập DOM `jsdom`.
+- **Realtime Chat**: Dùng `BroadcastChannel` + `localStorage` để đồng bộ chat đa người dùng theo thời gian thực giữa nhiều tab/session.
 
 ## Network & Data Loading
 - **API Client (Axios)**: Khởi tạo instance tập trung (`axios.create`). Áp dụng triệt để **Interceptors** để nhét Token tự động và xử lý lỗi global. Kết hợp `AbortController` (Signal) để hủy request thừa khi cần.
 - **Lazy Loading**: Sử dụng `defineAsyncComponent` để tải chậm các component nặng (như tab Biểu đồ).
+
+## Chat Architecture
+- **Composable-first Design**: Toan bo logic chat nam trong `useChat`, component UI chi render va goi action.
+- **Realtime Multi-user UX**: Ho tro dat ten hien thi, nhan dien user hien tai, bong chat phan biet "minh" va "nguoi khac", kem timestamp.
+- **Cross-tab Synchronization**: Ket hop `BroadcastChannel` (realtime) va su kien `storage` (fallback) de giu tin nhan nhat quan.
+- **Local Persistence Strategy**: Luu lich su chat co gioi han (`MAX_STORED_MESSAGES`) de tranh localStorage phinh to.
+- **CV-ready Talking Points**:
+  - "Implemented real-time browser-based multi-user chat using BroadcastChannel and Vue 3 Composition API."
+  - "Designed resilient state sync with dual-channel strategy (BroadcastChannel + storage events)."
+  - "Improved chat UI with responsive message grouping, sender identity, and lightweight persistence for performance."

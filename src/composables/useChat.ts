@@ -1,46 +1,45 @@
-import { ref, watch, nextTick, onMounted } from "vue"
-import { GoogleGenerativeAI } from "@google/generative-ai"
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue"
 
 export interface Message {
-  id: number
+  id: string
   text: string
-  sender: "user" | "bot"
+  senderId: string
+  senderName: string
   timestamp: number
 }
 
-const STORAGE_KEY = "finance_chat_history"
-
-const apiKey = import.meta.env.VITE_AI_API_KEY || ""
-const genAI = new GoogleGenerativeAI(apiKey)
+const STORAGE_KEY = "finance_community_chat_history"
+const USER_ID_KEY = "finance_chat_user_id"
+const PROFILE_NAME_KEY = "finance_chat_profile_name"
+const MAX_STORED_MESSAGES = 200
+const CHANNEL_NAME = "finance-community-chat"
 
 export function useChat() {
-  // ==========================================
-  // STATE CỦA COMPOSABLE
-  // ==========================================
   const isOpen = ref(false)
   const inputText = ref("")
   const messages = ref<Message[]>([])
   const chatContainer = ref<HTMLElement | null>(null)
+  const currentUserId = ref("")
+  const displayName = ref("")
+  const channel = typeof BroadcastChannel !== "undefined" ? new BroadcastChannel(CHANNEL_NAME) : null
 
-  // Thêm state isLoading để quản lý trạng thái chờ AI phản hồi
-  const isLoading = ref(false)
+  const canSend = computed(() => Boolean(inputText.value.trim() && displayName.value.trim()))
 
-  // ==========================================
-  // CÁC HÀM XỬ LÝ LOGIC (ACTIONS)
-  // ==========================================
+  const generateUserId = () => crypto.randomUUID()
+
+  const generateGuestName = () => {
+    const suffix = Math.floor(100 + Math.random() * 900)
+    return `Guest-${suffix}`
+  }
+
   const loadHistory = () => {
     const savedHistory = localStorage.getItem(STORAGE_KEY)
     if (savedHistory) {
-      messages.value = JSON.parse(savedHistory)
-    } else {
-      messages.value = [
-        {
-          id: Date.now(),
-          text: "Chào bạn! Mình có thể giúp gì cho việc quản lý chi tiêu của bạn hôm nay?",
-          sender: "bot",
-          timestamp: Date.now(),
-        },
-      ]
+      try {
+        messages.value = JSON.parse(savedHistory)
+      } catch {
+        messages.value = []
+      }
     }
   }
 
@@ -51,79 +50,104 @@ export function useChat() {
     }
   }
 
-  const sendMessage = async () => {
-    const text = inputText.value.trim()
-    if (!text || isLoading.value) return
+  const syncUserProfile = () => {
+    currentUserId.value = localStorage.getItem(USER_ID_KEY) || generateUserId()
+    localStorage.setItem(USER_ID_KEY, currentUserId.value)
 
-    // 1. Đẩy tin nhắn của User vào
-    messages.value.push({
-      id: Date.now(),
-      text,
-      sender: "user",
-      timestamp: Date.now(),
-    })
+    displayName.value = localStorage.getItem(PROFILE_NAME_KEY) || generateGuestName()
+    localStorage.setItem(PROFILE_NAME_KEY, displayName.value)
+  }
 
-    // 2. Dọn dẹp UI
-    inputText.value = ""
+  const mergeMessage = (newMessage: Message) => {
+    const isDuplicated = messages.value.some((message) => message.id === newMessage.id)
+    if (isDuplicated) return
+
+    messages.value.push(newMessage)
+    if (messages.value.length > MAX_STORED_MESSAGES) {
+      messages.value = messages.value.slice(-MAX_STORED_MESSAGES)
+    }
+
     scrollToBottom()
+  }
 
-    isLoading.value = true // Bật trạng thái loading
+  const sendMessage = () => {
+    const text = inputText.value.trim()
+    const name = displayName.value.trim()
+    if (!text || !name) return
 
-    try {
-      if (!apiKey) throw new Error("Thiếu API Key")
+    const message: Message = {
+      id: crypto.randomUUID(),
+      text,
+      senderId: currentUserId.value,
+      senderName: name,
+      timestamp: Date.now(),
+    }
 
-      const model = genAI.getGenerativeModel({ model: "gemini-3-flash-preview" })
+    mergeMessage(message)
+    channel?.postMessage(message)
+    inputText.value = ""
+  }
 
-      const result = await model.generateContent(text)
-      const responseText = result.response.text()
+  const updateDisplayName = (name: string) => {
+    const normalizedName = name.trim().slice(0, 24)
+    if (!normalizedName) return
+    displayName.value = normalizedName
+    localStorage.setItem(PROFILE_NAME_KEY, normalizedName)
+  }
 
-      // Đẩy tin nhắn của AI vào
-      messages.value.push({
-        id: Date.now(),
-        text: responseText,
-        sender: "bot",
-        timestamp: Date.now(),
-      })
+  const formatTime = (timestamp: number) =>
+    new Intl.DateTimeFormat("vi-VN", {
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(timestamp)
 
-    } catch (error) {
-      console.error("Lỗi khi gọi AI:", error)
-      messages.value.push({
-        id: Date.now(),
-        text: "Xin lỗi, đã có lỗi xảy ra khi kết nối với hệ thống. Vui lòng thử lại sau.",
-        sender: "bot",
-        timestamp: Date.now(),
-      })
-    } finally {
-      isLoading.value = false
+  const receiveMessage = (event: MessageEvent<Message>) => {
+    mergeMessage(event.data)
+  }
+
+  const syncByStorageEvent = (event: StorageEvent) => {
+    if (event.key === STORAGE_KEY && event.newValue) {
+      try {
+        messages.value = JSON.parse(event.newValue)
+      } catch {
+        messages.value = []
+      }
       scrollToBottom()
     }
   }
 
-  // ==========================================
-  // LIFECYCLES & WATCHERS
-  // ==========================================
   onMounted(() => {
+    syncUserProfile()
     loadHistory()
+    channel?.addEventListener("message", receiveMessage)
+    window.addEventListener("storage", syncByStorageEvent)
     scrollToBottom()
   })
 
+  onUnmounted(() => {
+    channel?.removeEventListener("message", receiveMessage)
+    channel?.close()
+    window.removeEventListener("storage", syncByStorageEvent)
+  })
+
   watch(
-      messages,
-      (newVal) => {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(newVal))
-      },
-      { deep: true },
+    messages,
+    (newVal) => {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(newVal.slice(-MAX_STORED_MESSAGES)))
+    },
+    { deep: true },
   )
 
-  // ==========================================
-  // EXPORT NHỮNG GÌ COMPONENT CẦN
-  // ==========================================
   return {
     isOpen,
     inputText,
     messages,
     chatContainer,
-    isLoading,
+    displayName,
+    currentUserId,
+    canSend,
+    formatTime,
     sendMessage,
+    updateDisplayName,
   }
 }
